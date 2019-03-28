@@ -1,0 +1,3 @@
+elixir {{cookiecutter.elixir_version}}
+erlang {{cookiecutter.erlang_version}}
+nodejs {{cookiecutter.nodejs_version}}
