@@ -1,0 +1,82 @@
+version: 2.1
+
+orbs:
+  slack: circleci/slack@volatile
+
+jobs:
+    build:
+        docker:
+            - image: circleci/elixir:1.8.1
+              environment:
+                MIX_ENV=test
+            - image: circleci/postgres:10.5-alpine
+
+
+        {% raw %}
+        steps:
+            - checkout
+
+            # mix deps
+            - restore_cache:
+                keys:
+                    - v0-mix-{{ .Branch }}-{{ checksum "mix.lock" }}
+                    - v0-mix-{{ .Branch }}
+                    - v0-mix
+            # _build
+            - restore_cache:
+                keys:
+                    - v0-build-{{ .Branch }}
+                    - v0-build
+
+            - run: mix local.hex --force
+            - run: mix local.rebar --force
+            - run: mix deps.get
+            - run: mix deps.compile
+            - run: mix format --check-formatted
+            - run: mix test
+            - run: mix dialyzer --plt --halt-exit-status
+
+            # cache mix
+            - save_cache:
+                key: v0-deps-{{ .Branch }}-{{ checksum "mix.lock" }}
+                paths: "deps"
+            - save_cache:
+                key: v0-deps-{{ .Branch }}
+                paths: "deps"
+            - save_cache:
+                key: v0-deps
+                paths: "deps"
+
+            # cache _build
+            - save_cache:
+                key: v0-build-{{ .Branch }}
+                paths: "_build"
+            - save_cache:
+                key: v0-build
+                paths: "_build"
+        {% endraw %}
+
+    {% if cookiecutter.deploy_to == "heroku" %}
+    deploy:
+        docker:
+            - image: buildpack-deps:trusty
+        steps:
+            - checkout
+            - run:
+                name: deploy master to heroku
+                command: |
+                    git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
+    {% endif %}
+workflows:
+    version: 2
+    build_and_deploy:
+        jobs:
+            - build
+            {% if cookiecutter.deploy_to == "heroku" %}
+            - deploy:
+                requires:
+                    - build
+                filters:
+                    branches:
+                        only: master
+            {% endif %}
