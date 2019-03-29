@@ -56,6 +56,10 @@ jobs:
                 paths: "_build"
         {% endraw %}
 
+            - slack/status:
+                fail_only: "true"
+                webhook: {{ slack_webhook }}
+
     {% if cookiecutter.deploy_to == "heroku" %}
     deploy:
         docker:
