@@ -20,9 +20,13 @@ mix phx.new {{cookiecutter.project_name}} --umbrella
 rsync -au {{cookiecutter.project_name}}_umbrella/ .
 rm -rf {{cookiecutter.project_name}}_umbrella
 
+core_folder=apps/{{cookiecutter.project_name}}
 web_name={{cookiecutter.project_name}}_web
 web_folder=apps/${web_name}
 web_folder_web=${web_folder}/lib/${web_name}
+
+sed -i -e "/import_config/s/^/# /" $web_folder'/config/prod.exs'
+sed -i -e "/import_config/s/^/# /" $core_folder'/config/prod.exs'
 
 case '{{cookiecutter.phoenix_auth}}' in
      'Ueberauth')
