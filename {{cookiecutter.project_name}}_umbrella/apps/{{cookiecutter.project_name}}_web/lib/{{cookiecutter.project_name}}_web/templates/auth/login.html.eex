@@ -1,0 +1,15 @@
+<%= form_tag @callback_url, method: "post" do %>
+  <div class='control-group'>
+    <label class='control-label' for='username-input'>Username</label>
+    <input class='form-control' type="text" name='username' value='<%= @conn.params["username"] %>' />
+  </div>
+
+  <div class='control-group'>
+    <label class='control-label' for='password-input'>Password</label>
+    <input class='form-control' type='password' name='password' />
+  </div>
+
+  <div class='control-group'>
+    <button class='btn btn-primary'>Login</button>
+  </div>
+<% end %>
