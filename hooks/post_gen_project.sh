@@ -28,7 +28,7 @@ web_folder_web=${web_folder}/lib/${web_name}
 
 sed -i -e "/import_config/s/^/# /" $web_folder'/config/prod.exs'
 
-db_url='config :talking_talent, TalkingTalent.Repo, url: System.get_env("DATABASE_URL"), pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"), ssl: true'
+db_url='config :{{ cookiecutter.project_name }}, {{ cookiecutter.phoenix_module_name }}.Repo, url: System.get_env("DATABASE_URL"), pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"), ssl: true'
 sed -i -e "/import_config/s/^/${db_url}\\$nl# /" $core_folder'/config/prod.exs'
 
 case '{{cookiecutter.phoenix_auth}}' in
@@ -36,7 +36,7 @@ case '{{cookiecutter.phoenix_auth}}' in
          config='config :ueberauth, Ueberauth, providers: [identity: {Ueberauth.Strategy.Identity, [callback_methods: ["POST"]]}]'
          sed -i -e "/^# Import/s/^/\\$config\\$nl/" $web_folder'/config/config.exs'
 
-         routes='scope "/auth", MyApp do pipe_through :browser get "/:provider", AuthController, :request get "/:provider/callback", AuthController, :callback post "/:provider/callback", AuthController, :callback delete "/logout", AuthController, :delete end'
+         routes='scope "/auth", {{ cookiecutter.phoenix_module_name }} do pipe_through :browser get "/:provider", AuthController, :request get "/:provider/callback", AuthController, :callback post "/:provider/callback", AuthController, :callback delete "/logout", AuthController, :delete end'
          sed -i -e "/use.*:router/s/$/\\${nl}require Ueberauth/" $web_folder_web'/router.ex'
          sed -i -e "/^end/s~^~\\$routes\\$nl~" $web_folder_web'/router.ex'
 
