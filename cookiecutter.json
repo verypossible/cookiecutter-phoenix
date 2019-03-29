@@ -2,7 +2,7 @@
   "project_name": null,
   "slack_webhook": null,
   "elixir_version": "1.8.1-otp-21",
-  "erlang_version": "21.3.2",
+  "erlang_version": "21.2.5",
   "nodejs_version": "10.15.3",
   "phoenix_version": "1.4.2",
   "deploy_to": "heroku",

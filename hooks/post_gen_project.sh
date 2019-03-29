@@ -45,4 +45,16 @@ case '{{cookiecutter.phoenix_auth}}' in
          ;;
 esac
 
-log 'You will need to add your repository to CircleCI and set the HEROKU_API_KEY environment variable.'
+git init
+
+git add .
+
+git commit -m 'Initial commit'
+
+log 'TODO:'
+log '1) You will need to add your repository to CircleCI and set the HEROKU_API_KEY environment variable.'
+log '2) A script called setup_heroku has been placed in the project root.'
+
+log ''
+log 'You are logged into Heroku as:'
+heroku whoami
