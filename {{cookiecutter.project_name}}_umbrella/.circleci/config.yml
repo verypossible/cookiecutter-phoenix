@@ -6,10 +6,10 @@ orbs:
 jobs:
     build:
         docker:
-            - image: circleci/elixir:1.8.1
+            - image: circleci/elixir:{{ cookiecutter.elixir_version.split('-')[0] }}
               environment:
                 MIX_ENV=test
-            - image: circleci/postgres:10.5-alpine
+            - image: circleci/postgres:11-alpine
 
 
         {% raw %}
@@ -32,9 +32,6 @@ jobs:
             - run: mix local.rebar --force
             - run: mix deps.get
             - run: mix deps.compile
-            - run: mix format --check-formatted
-            - run: mix test
-            - run: mix dialyzer --plt --halt-exit-status
 
             # cache mix
             - save_cache:
@@ -54,11 +51,17 @@ jobs:
             - save_cache:
                 key: v0-build
                 paths: "_build"
+
+            # run tests
+            - run: mix format --check-formatted
+            - run: mix test
+            - run: MIX_ENV=prod mix do clean, compile --warnings-as-errors
         {% endraw %}
 
             - slack/status:
                 fail_only: "true"
-                webhook: {{ slack_webhook }}
+                webhook: {{ cookiecutter.slack_webhook }}
+                only_for_branch: master
 
     {% if cookiecutter.deploy_to == "heroku" %}
     deploy:
@@ -69,7 +72,7 @@ jobs:
             - run:
                 name: deploy master to heroku
                 command: |
-                    git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
+                    git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/{{ cookiecutter.heroku_app_name }}.git master
     {% endif %}
 workflows:
     version: 2
