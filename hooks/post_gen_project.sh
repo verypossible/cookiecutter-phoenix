@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+{% set web_app = "{}_web".format(cookiecutter.project_name) %}
 
 set -e
 
@@ -9,14 +10,7 @@ log() {
   printf "$blue$1$reset\n"
 }
 
-asdf install
-
-mix archive.install hex phx_new {{cookiecutter.phoenix_version}}
-
-# Generate Umbrella app
-mix phx.new {{cookiecutter.project_name}} --umbrella
-
-# Move generated files so that dir name is the same as the user inputed project name.
+# Move generated files so that dir name is the same as the user provided project name.
 rsync -au {{cookiecutter.project_name}}_umbrella/ .
 rm -rf {{cookiecutter.project_name}}_umbrella
 
@@ -54,11 +48,21 @@ case '{{cookiecutter.phoenix_auth}}' in
          mix format
          ;;
      *)
-         rm lib/{{cookiecutter.project_name}}_web/controllers/auth_controller.ex
-         rm lib/{{cookiecutter.project_name}}_web/views/auth_view.ex
-         rm -Rf lib/{{cookiecutter.project_name}}_web/templates/auth
+         rm apps/{{web_app}}/lib/{{web_app}}/controllers/auth_controller.ex
+         rm apps/{{web_app}}/lib/{{web_app}}/views/auth_view.ex
+         rm -Rf apps/{{web_app}}/lib/{{web_app}}/templates/auth
          ;;
 esac
+
+# Start Cleanup Logic for Optional Files
+{% if cookiecutter.deploy_to != "heroku" %}
+rm Procfile
+rm compile
+rm elixir_buildpack.config
+rm phoenix_static_buildpack.config
+rm setup_heroku
+{% endif %}
+# Stop Cleanup Logic
 
 git init
 
@@ -67,9 +71,16 @@ git add .
 git commit -m 'Initial commit'
 
 log 'TODO:'
-log '1) You will need to add your repository to CircleCI and set the HEROKU_API_KEY environment variable.'
-log '2) A script called setup_heroku has been placed in the project root.'
+log '- You will need to add your repository to CircleCI'
 
+# TODO add a check for CircleCI option
+{% if cookiecutter.deploy_to == "heroku" %}
+log '- Set the HEROKU_API_KEY environment variable in CircleCI.'
+{% endif %}
+
+{% if cookiecutter.deploy_to == "heroku" %}
+log '- A script called setup_heroku has been placed in the project root.'
 log ''
 log 'You are logged into Heroku as:'
 heroku whoami
+{% endif %}
