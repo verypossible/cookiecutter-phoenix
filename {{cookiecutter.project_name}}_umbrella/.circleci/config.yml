@@ -10,9 +10,7 @@ jobs:
               environment:
                 MIX_ENV=test
             - image: circleci/postgres:11-alpine
-
-
-        {% raw %}
+{% raw %}
         steps:
             - checkout
 
@@ -56,14 +54,14 @@ jobs:
             - run: mix format --check-formatted
             - run: mix test
             - run: MIX_ENV=prod mix do clean, compile --warnings-as-errors
-        {% endraw %}
-
+{% endraw %}
+{% if cookiecutter.slack_webhook != "None" %}
             - slack/status:
                 fail_only: "true"
                 webhook: {{ cookiecutter.slack_webhook }}
                 only_for_branch: master
-
-    {% if cookiecutter.deploy_to == "heroku" %}
+{% endif %}
+{% if cookiecutter.deploy_to == "heroku" %}
     deploy:
         docker:
             - image: buildpack-deps:trusty
@@ -73,7 +71,7 @@ jobs:
                 name: deploy master to heroku
                 command: |
                     git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/{{ cookiecutter.heroku_app_name }}.git master
-    {% endif %}
+{% endif %}
 workflows:
     version: 2
     build_and_deploy:
@@ -86,4 +84,4 @@ workflows:
                 filters:
                     branches:
                         only: master
-            {% endif %}
+{% endif %}
