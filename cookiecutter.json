@@ -5,8 +5,8 @@
   "erlang_version": "21.2.5",
   "nodejs_version": "10.15.3",
   "phoenix_version": "1.4.2",
-  "deploy_to": "heroku",
-  "heroku_app_name": "{{ cookiecutter.project_name.replace('_', '-') }}",
+  "deploy_to": ["heroku", "None"],
   "phoenix_auth": ["Ueberauth", "None"],
+  "heroku_app_name": "{{ cookiecutter.project_name.replace('_', '-') }}",
   "phoenix_module_name": "{{cookiecutter.project_name.split('_') | map('capitalize') | join()}}"
 }

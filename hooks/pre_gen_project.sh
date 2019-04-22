@@ -15,3 +15,16 @@ if [ "$status" -ne "0" ]; then
   exit 1
 fi
 {% endif %}
+
+cat <<EOF > .tool-versions
+elixir {{cookiecutter.elixir_version}}
+erlang {{cookiecutter.erlang_version}}
+nodejs {{cookiecutter.nodejs_version}}
+EOF
+
+asdf install
+
+mix archive.install hex phx_new {{cookiecutter.phoenix_version}}
+
+# Generate Umbrella app
+mix phx.new {{cookiecutter.project_name}} --umbrella
